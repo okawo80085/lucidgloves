@@ -1,21 +1,22 @@
 #define ALWAYS_CALIBRATING CALIBRATION_LOOPS == -1
 
 ICommunication* comm;
+inputData g_inputs;
 int loops = 0;
 void setup() {
   #if COMMUNICATION == COMM_SERIAL
     comm = new SerialCommunication();
   #elif COMMUNICATION == COMM_BTSERIAL
     comm = new BTSerialCommunication();
-  #endif  
+  #endif
   comm->start();
 
   setupInputs();
 
   #if USING_FORCE_FEEDBACK
-    setupServoHaptics();  
+    setupServoHaptics();
   #endif
-  
+
 }
 
 void loop() {
@@ -27,40 +28,51 @@ void loop() {
     #else
     bool calibButton = false;
     #endif
-    
+
+    g_inputs.calib = calibButton;
+
     bool calibrate = false;
     if (loops < CALIBRATION_LOOPS || ALWAYS_CALIBRATING){
       calibrate = true;
       loops++;
     }
-    
+
     int* fingerPos = getFingerPositions(calibrate, calibButton);
-    bool joyButton = getButton(PIN_JOY_BTN);
+    // ugly but fast
+    g_inputs.flexion[0] = fingerPos[0];
+    g_inputs.flexion[1] = fingerPos[1];
+    g_inputs.flexion[2] = fingerPos[2];
+    g_inputs.flexion[3] = fingerPos[3];
+    g_inputs.flexion[4] = fingerPos[4];
+    g_inputs.joyClick = getButton(PIN_JOY_BTN);
 
     #if TRIGGER_GESTURE
-    bool triggerButton = triggerGesture(fingerPos);
+    g_inputs.triggerButton = triggerGesture(fingerPos);
     #else
-    bool triggerButton = getButton(PIN_TRIG_BTN);
+    g_inputs.triggerButton = getButton(PIN_TRIG_BTN);
     #endif
 
-    bool aButton = getButton(PIN_A_BTN);
-    bool bButton = getButton(PIN_B_BTN);
+    g_inputs.aButton = getButton(PIN_A_BTN);
+    g_inputs.bButton = getButton(PIN_B_BTN);
 
     #if GRAB_GESTURE
-    bool grabButton = grabGesture(fingerPos);
+    g_inputs.grab = grabGesture(fingerPos);
     #else
-    bool grabButton = getButton(PIN_GRAB_BTN);
+    g_inputs.grab = getButton(PIN_GRAB_BTN);
     #endif
 
     #if PINCH_GESTURE
-    bool pinchButton = grabGesture(fingerPos);
+    g_inputs.pinch = grabGesture(fingerPos);
     #else
-    bool pinchButton = getButton(PIN_PNCH_BTN);
+    g_inputs.pinch = getButton(PIN_PNCH_BTN);
     #endif
 
-    bool menuButton = getButton(PIN_MENU_BTN);
-    
-    comm->print(encode(fingerPos, getJoyX(), getJoyY(), joyButton, triggerButton, aButton, bButton, grabButton, pinchButton, calibButton, menuButton));
+    g_inputs.menu = getButton(PIN_MENU_BTN);
+
+    g_inputs.joyX = getJoyX();
+    g_inputs.joyY = getJoyY();
+
+    comm->write(&g_inputs);
 
     #if USING_FORCE_FEEDBACK
       char received[100];

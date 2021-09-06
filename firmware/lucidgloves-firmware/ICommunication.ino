@@ -1,17 +1,19 @@
 //Interface for communication
-
+#pragma pack(push, 1)
 struct inputData {
-  int flexion[5];
-  int joyX;
-  int joyY;
+  int32_t flexion[5];
+  int32_t joyX;
+  int32_t joyY;
   bool joyClick;
   bool triggerButton;
   bool aButton;
   bool bButton;
   bool grab;
   bool pinch;
+  bool calib;
+  bool menu;
 };
-
+#pragma pack(pop)
 
 
 class ICommunication {

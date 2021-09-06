@@ -1,15 +1,4 @@
-/*struct inputData {
-  int* flexion;
-  int joyX;
-  int joyY;
-  bool joyClick;
-  bool triggerButton;
-  bool aButton;
-  bool bButton;
-  bool grab;
-  bool pinch;
-};
-
+/*
 struct outputData{
   int* hapticLimits;
 };

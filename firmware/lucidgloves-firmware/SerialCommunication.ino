@@ -17,14 +17,18 @@ class SerialCommunication : public ICommunication {
       m_isOpen = true;
     }
 
-    void output(char* data){
+    void print(char* data){
       Serial.print(data);
       Serial.flush();
     }
 
+    void write(inputData* data){
+      Serial.write((char*)data, sizeof(*data));
+    }
+
     bool readData(char* input){
       byte size = Serial.readBytesUntil('\n', input, 100);
-      input[size] = NULL;
+      input[size] = '\0';
       return input != NULL && strlen(input) > 0;
     }
 };

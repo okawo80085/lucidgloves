@@ -22,8 +22,12 @@ class BTSerialCommunication : public ICommunication {
       m_isOpen = true;
     }
 
-    void output(char* data){
+    void print(char* data){
       m_SerialBT.print(data);
+    }
+
+    void write(inputData* data){
+      m_SerialBT.write(data, sizeof(*data));
     }
 
     bool readData(char* input){
